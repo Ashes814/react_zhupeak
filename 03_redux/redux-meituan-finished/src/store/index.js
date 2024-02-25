@@ -1,10 +1,10 @@
-import foodsReducer from './modules/takeaway'
-import { configureStore } from '@reduxjs/toolkit'
+import foodReducer from "./modules/takeaway";
+import { configureStore } from "@reduxjs/toolkit";
 
 const store = configureStore({
   reducer: {
-    foods: foodsReducer
-  }
-})
+    foods: foodReducer,
+  },
+});
 
-export default store
+export default store;
