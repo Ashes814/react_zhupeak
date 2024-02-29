@@ -1,5 +1,7 @@
 // axios ecapsulation
 import axios from "axios";
+import { getToken, removeToken } from "./token";
+import router from "@/router";
 // 1. root url
 // 2. timeout
 const request = axios.create({
@@ -10,6 +12,14 @@ const request = axios.create({
 
 request.interceptors.request.use(
   (config) => {
+    // inject token
+    // 1. get token
+    // 2. set token
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   (error) => {
@@ -21,6 +31,12 @@ request.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    console.dir(error);
+    if (error.response.status === 401) {
+      removeToken();
+      router.navigate("/login");
+      window.location.reload();
+    }
     return Promise.reject(error);
   }
 );

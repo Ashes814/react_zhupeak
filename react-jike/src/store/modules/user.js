@@ -1,12 +1,14 @@
 // State related to User
 import { createSlice } from "@reduxjs/toolkit";
-import { request, setToken as _setToken, getToken } from "@/utils";
+import { request, setToken as _setToken, getToken, removeToken } from "@/utils";
+import { loginApi, getProfileApi } from "@/apis/user";
 
 const userStore = createSlice({
   name: "user",
   // data state
   initialState: {
     token: getToken() ? getToken() : "",
+    userInfo: {},
   },
 
   // syncronous actions
@@ -16,23 +18,39 @@ const userStore = createSlice({
 
       _setToken(action.payload);
     },
+    setUserInfo(state, action) {
+      state.userInfo = action.payload;
+    },
+    clearUserInfo(state) {
+      state.token = "";
+      state.userInfo = {};
+      removeToken();
+    },
   },
 });
 
 // 解构actionCreater
-const { setToken } = userStore.actions;
+const { setToken, setUserInfo, clearUserInfo } = userStore.actions;
 
 const userReducer = userStore.reducer;
 
 // 异步action
 const fetchLogin = (loginForm) => {
   return async (dispatch) => {
-    const res = await request.post("/authorizations", loginForm);
+    const res = await loginApi(loginForm);
 
     dispatch(setToken(res.data.token));
   };
 };
 
-export { fetchLogin, setToken };
+// get userInfo
+const fetchUserInfo = () => {
+  return async (dispatch) => {
+    const res = await getProfileApi();
+    dispatch(setUserInfo(res.data));
+  };
+};
+
+export { fetchLogin, fetchUserInfo, setToken, clearUserInfo };
 
 export default userReducer;
