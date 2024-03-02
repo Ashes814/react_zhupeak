@@ -98,17 +98,44 @@ const Article = () => {
     },
   ];
 
+  const [reqData, setReqData] = useState({
+    status: "",
+    channel_id: "",
+    begin_pubdate: "",
+    end_pubdate: "",
+    page: 1,
+    per_page: 4,
+  });
+
   const [list, setList] = useState([]);
   const [count, setCount] = useState(0);
   useEffect(() => {
     const getList = async () => {
-      const res = await getArticleListAPI();
+      const res = await getArticleListAPI(reqData);
       setList(res.data.results);
       setCount(res.data.total_count);
     };
     getList();
-  }, []);
+  }, [reqData]);
   const { channelList } = useChannel();
+
+  const onFinish = (values) => {
+    setReqData({
+      ...reqData,
+      channel_id: values.channel_id,
+      status: values.status,
+      begin_pubdate: values.date ? values.date[0].format("YYYY-MM-DD") : "",
+      end_pubdate: values.date ? values.date[1].format("YYYY-MM-DD") : "",
+    });
+  };
+
+  const onPageChange = (page) => {
+    console.log(page);
+    setReqData({
+      ...reqData,
+      page,
+    });
+  };
   return (
     <div>
       <Card
@@ -122,7 +149,7 @@ const Article = () => {
         }
         style={{ marginBottom: 20 }}
       >
-        <Form initialValues={{ status: "" }}>
+        <Form initialValues={{ status: "" }} onFinish={onFinish}>
           <Form.Item label="状态" name="status">
             <Radio.Group>
               <Radio value={""}>全部</Radio>
@@ -162,7 +189,16 @@ const Article = () => {
 
       {/*        */}
       <Card title={`根据筛选条件共查询到 ${count} 条结果：`}>
-        <Table rowKey="id" columns={columns} dataSource={list} />
+        <Table
+          rowKey="id"
+          columns={columns}
+          dataSource={list}
+          pagination={{
+            total: count,
+            pageSize: reqData.per_page,
+            onChange: onPageChange,
+          }}
+        />
       </Card>
     </div>
   );
