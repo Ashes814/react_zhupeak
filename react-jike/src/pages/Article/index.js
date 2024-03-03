@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   Breadcrumb,
@@ -7,6 +7,7 @@ import {
   Radio,
   DatePicker,
   Select,
+  Popconfirm,
 } from "antd";
 import { useChannel } from "@/hooks/useChannel";
 import { useEffect, useState } from "react";
@@ -16,15 +17,22 @@ import locale from "antd/es/date-picker/locale/zh_CN";
 import { Table, Tag, Space } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import img404 from "@/assets/error.png";
-import { getArticleListAPI } from "@/apis/article";
+import { delArticleAPI, getArticleListAPI } from "@/apis/article";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Article = () => {
+  const navigate = useNavigate();
   const status = {
     1: <Tag color="warning">待审核</Tag>,
     2: <Tag color="success">审核通过</Tag>,
+  };
+  const onConfirm = async (data) => {
+    await delArticleAPI(data.id);
+    setReqData({
+      ...reqData,
+    });
   };
   const columns = [
     {
@@ -70,13 +78,28 @@ const Article = () => {
       render: (data) => {
         return (
           <Space size="middle">
-            <Button type="primary" shape="circle" icon={<EditOutlined />} />
             <Button
               type="primary"
-              danger
               shape="circle"
-              icon={<DeleteOutlined />}
+              icon={<EditOutlined />}
+              onClick={() => {
+                navigate(`/publish?id=${data.id}`);
+              }}
             />
+            <Popconfirm
+              title="删除文章"
+              description="Are you sure?"
+              onConfirm={onConfirm}
+              onText="Yes"
+              cancelText="顶"
+            >
+              <Button
+                type="primary"
+                danger
+                shape="circle"
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
           </Space>
         );
       },
@@ -130,7 +153,6 @@ const Article = () => {
   };
 
   const onPageChange = (page) => {
-    console.log(page);
     setReqData({
       ...reqData,
       page,

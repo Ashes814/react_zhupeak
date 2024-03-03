@@ -15,10 +15,32 @@ export function createArticleAPI(data) {
   });
 }
 
+export function updateArticleAPI(data) {
+  return request({
+    url: `/mp/articles/${data.id}?draft=false`,
+    method: "PUT",
+    data,
+  });
+}
+
 export function getArticleListAPI(params) {
   return request({
     url: "/mp/articles",
     method: "GET",
     params,
+  });
+}
+
+export function delArticleAPI(id) {
+  return request({
+    url: `mp/articles/${id}`,
+    method: "DELETE",
+  });
+}
+
+export function getArticleById(id) {
+  return request({
+    url: `mp/articles/${id}`,
+    method: "GET",
   });
 }
