@@ -5,6 +5,7 @@ const billStore = createSlice({
   name: "billStore",
   initialState: {
     billList: [],
+    billList: [],
   },
   reducers: {
     setBillList(state, action) {
